@@ -25,8 +25,26 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+/dev/null                 0666   root       root
+/dev/zero                 0666   root       root
+/dev/full                 0666   root       root
+/dev/ptmx                 0666   root       root
+/dev/tty                  0666   root       root
+/dev/random               0666   root       root
+/dev/urandom              0666   root       root
+
+/dev/ashmem               0666   root       root
+/dev/binder               0666   root       root
+/dev/tspdrv               0666   root       root
+/dev/ttyHSL0             0660   radio      system
+# logger should be world writable (for logging) but not readable
+/dev/log/*                0666   root       log
+
 # The DIAG device node is not world writable/readable.
 /dev/diag                 0660   system     qcom_diag
+/dev/ttydiag0             0660   system     qcom_diag
+/dev/ttydiag1             0660   system     qcom_diag
+/dev/ttydiag2             0660   system     qcom_diag
 
 /dev/genlock              0666   system     system
 /dev/kgsl                 0666   system     system
@@ -132,7 +150,8 @@
 /dev/msm_vidc_enc         0660   system     audio
 /dev/msm_rotator          0660   system     system
 /dev/hw_random            0600   root       root
-/dev/adsprpc-smd          0664   system     system
+/dev/sdsprpc-smd          0660   system     system
+
 
 # Permissions for audio
 /dev/audio_slimslave      0660   system     audio
@@ -227,6 +246,8 @@
 /dev/nfc-nci              0660    nfc         nfc
 /dev/nq-nci               0660    nfc         nfc
 /dev/assd                 0660    nfc         nfc
+/dev/pn544                0660    nfc         nfc
+/dev/bcm2079x-i2c         0660    nfc         nfc
 
 # UIO devices
 /dev/uio0                 0660   system     system
@@ -235,6 +256,9 @@
 
 # SSR devices
 /dev/subsys_*         0640   system     system
+
+# Add device block for FRP
+/dev/block/bootdevice/by-name/frp 0600 system system
 
 # Ultrasound device
 /dev/usf1                 0660   system     system
@@ -250,10 +274,76 @@
 /dev/hbtp_vm              0660   system     system
 
 # Add device block for FRP
-/dev/block/platform/soc/7824900.sdhci/by-name/config    0600   system     system
+/dev/block/platform/soc/7464900.sdhci/by-name/frp       0600   system     system
+/dev/block/platform/soc/624000.ufshc/by-name/frp        0600   system     system
+/dev/block/bootdevice/by-name/frp 0600 system system
+
+# I2C
+/dev/i2c-*                0660   system     system
+
+#JOT fixture devices for AMPS factory testing
+/dev/hidraw0              0660   root       mot_tcmd
+/dev/hidraw1              0660   root       mot_tcmd
+
+# MOD device
+/sys/devices/soc/75b5000.i2c/i2c-7/7-0072 irq_enable 0660 mot_tcmd mot_tcmd
+/sys/devices/soc/0.apba_ctrl apba_enable 0660 mot_tcmd mot_mod
+/sys/devices/soc/0.apba_ctrl apba_mode 0660 mot_tcmd mot_mod
+/sys/devices/soc/0.apba_ctrl flash_partition 0220 mot_tcmd mot_mod
+/sys/devices/soc/0.apba_ctrl unipro_mid 0440 root mot_mod
+/sys/devices/soc/0.apba_ctrl unipro_pid 0440 root mot_mod
+/sys/devices/soc/0.apba_ctrl vid 0440 root mot_mod
+/sys/devices/soc/0.apba_ctrl pid 0440 root mot_mod
+/sys/devices/soc/0.apba_ctrl fw_version 0440 root mot_mod
+/sys/devices/soc/0.apba_ctrl fw_version_str 0440 root mot_mod
+/sys/devices/soc/soc:muc_svc@0/mods_interfaces/* hotplug 0660 root mot_mod
+/sys/devices/soc/soc:muc_svc@0/mods_interfaces/* uevent 0660 root mot_mod
+/sys/devices/soc/soc:muc_svc@0/mods_interfaces/* current_limit 0220 root mot_mod
+/sys/devices/soc/soc:muc_svc@0/mods_interfaces/* rtc_sync 0220 root mot_mod
+/sys/devices/soc/soc:muc_svc@0 flashmode 0660 root mot_mod
+/sys/devices/soc/soc:muc_svc@0 reset 0660 root mot_mod
+/sys/devices/soc/0.muc/0.muc:muc_svc@0/mods_interfaces/* hotplug 0660 root mot_mod
+/sys/devices/soc/0.muc/0.muc:muc_svc@0/mods_interfaces/* uevent 0660 root mot_mod
+/sys/devices/soc/0.muc/0.muc:muc_svc@0 flashmode 0660 root mot_mod
+/sys/devices/platform/mods_ap uevent 0660 root mot_mod
+/sys/devices/platform/mods_ap/* uevent 0660 root mot_mod
+/sys/devices/platform/mods_ap/greybus1 uevent 0664 root mot_mod
 
 # fpc Fingerprint
 /sys/devices/soc/soc:fpc1020		hw_reset			0220   system     system
 /sys/devices/soc/soc:fpc1020		irq	        		0660   system     system
 /sys/devices/soc/soc:fpc1020      	wakeup_enable	        	0220   system     system
 /sys/devices/soc/soc:fpc1020      	compatible_all	        	0220   system     system
+
+# MOD display device
+/sys/devices/platform/mods_ap/greybus1/*/*/display/display* state 0660 root mot_mod
+/sys/devices/platform/mods_ap/greybus1/*/*/display/display* config 0444 root mot_mod
+/sys/devices/platform/mods_ap/greybus1/*/*/display/display* notification 0660 root mot_mod
+
+# MOD light device
+/sys/devices/platform/mods_ap/greybus1/*/*/leds/mod_light*::backlight brightness 0660 root mot_mod
+
+# RAW device
+/dev/gbraw*             0660   root   mot_mod
+# Audio device
+/sys/devices/platform/mods_codec.0 uevent 0660 root mot_mod
+/sys/devices/platform/mods_codec.0/* uevent 0660 root mot_mod
+
+# MOD camera device
+/dev/mot_camera_ext*               0660   system     camera
+/sys/devices/virtual/video4linux/mot_camera_ext* open_mode 0660 system camera
+/sys/devices/virtual/video4linux/mot_camera_ext* uevent 0660 root mot_mod
+/sys/devices/virtual/video4linux/video* open_mode 0660 system camera
+/sys/devices/virtual/video4linux/video* uevent 0660 root mot_mod
+
+# Laser device
+/dev/laser                0660   system     camera
+
+# haptic
+/dev/drv2605              0660   system     system
+
+#DTV
+/dev/isdbt                 0660 mot_dtv  mot_dtv
+
+#Egistec fingerprint
+/dev/esfp0		  0660   system     system
